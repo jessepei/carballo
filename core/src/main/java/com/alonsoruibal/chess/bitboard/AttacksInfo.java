@@ -100,9 +100,6 @@ public class AttacksInfo {
 		}
 		boardKey = board.getKey();
 		long all = board.getAll();
-		long mines = board.getMines();
-		long myKing = board.kings & mines;
-		int us = board.getTurn() ? 0 : 1;
 
 		attackedSquaresAlsoPinned[W] = 0;
 		attackedSquaresAlsoPinned[B] = 0;
@@ -136,10 +133,15 @@ public class AttacksInfo {
 		checkPinnerRook(kingIndex[W], rookAttacksKing[W], all, board.whites, (board.rooks | board.queens) & board.blacks);
 		rookAttacksKing[B] = bbAttacks.getRookAttacks(kingIndex[B], all);
 		checkPinnerRook(kingIndex[B], rookAttacksKing[B], all, board.blacks, (board.rooks | board.queens) & board.whites);
-		attack(all, mines, myKing, us, board);
+		attack(board);
 	}
 
-	public void attack(long all, long mines, long myKing, int us, Board board) {
+	public void attack(Board board) {
+		long all = board.getAll();
+		long mines = board.getMines();
+		long myKing = board.kings & mines;
+		int us = board.getTurn() ? 0 : 1;
+
 		long pieceAttacks;
 		int index;
 		long square = 1;
