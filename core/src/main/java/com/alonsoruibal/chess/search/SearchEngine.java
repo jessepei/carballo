@@ -218,37 +218,6 @@ public class SearchEngine implements Runnable {
 		return (board.getMines() & (board.knights | board.bishops | board.rooks | board.queens)) != 0;
 	}
 
-	/**
-	 * Returns true if we can use the value stored on the TT to return from search
-	 */
-	private boolean canUseTT(int depthRemaining, int alpha, int beta) {
-		if (tt.getDepthAnalyzed() >= depthRemaining) {
-			switch (tt.getNodeType()) {
-				case TranspositionTable.TYPE_EXACT_SCORE:
-					if (SearchStats.DEBUG) {
-						SearchStats.ttPvHit++;
-					}
-					return true;
-				case TranspositionTable.TYPE_FAIL_LOW:
-					if (SearchStats.DEBUG) {
-						SearchStats.ttLBHit++;
-					}
-					if (tt.getScore() <= alpha) {
-						return true;
-					}
-					break;
-				case TranspositionTable.TYPE_FAIL_HIGH:
-					if (SearchStats.DEBUG) {
-						SearchStats.ttUBHit++;
-					}
-					if (tt.getScore() >= beta) {
-						return true;
-					}
-					break;
-			}
-		}
-		return false;
-	}
 
 	/**
 	 * It also changes the sign to the score depending of the turn
@@ -312,7 +281,7 @@ public class SearchEngine implements Runnable {
 		}
 		boolean foundTT = tt.search(board, distanceToInitialPly, false);
 		if (foundTT) {
-			if (!isPv && canUseTT(ttDepth, alpha, beta)) {
+			if (!isPv && tt.canUseTT(ttDepth, alpha, beta)) {
 				return tt.getScore();
 			}
 			node.ttMove = tt.getBestMove();
@@ -443,7 +412,7 @@ public class SearchEngine implements Runnable {
 		}
 		boolean foundTT = tt.search(board, distanceToInitialPly, excludedMove != Move.NONE);
 		if (foundTT) {
-			if (nodeType != NODE_ROOT && canUseTT(depthRemaining, alpha, beta)) {
+			if (nodeType != NODE_ROOT && tt.canUseTT(depthRemaining, alpha, beta)) {
 				if (distanceToInitialPly + tt.getDepthAnalyzed() > selDepth) {
 					selDepth = distanceToInitialPly + tt.getDepthAnalyzed();
 				}
@@ -855,7 +824,7 @@ public class SearchEngine implements Runnable {
 
 		depth = 1;
 		boolean foundTT = tt.search(board, 0, false);
-		if (canUseTT(0, -Evaluator.MATE, Evaluator.MATE)) {
+		if (tt.canUseTT(0, -Evaluator.MATE, Evaluator.MATE)) {
 			rootScore = tt.getScore();
 		} else {
 			evaluate(nodes[0], foundTT);

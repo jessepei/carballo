@@ -5,6 +5,7 @@ import com.alonsoruibal.chess.Move;
 import com.alonsoruibal.chess.evaluation.Evaluator;
 import com.alonsoruibal.chess.log.Logger;
 import com.alonsoruibal.chess.search.SearchEngine;
+import com.alonsoruibal.chess.search.SearchStats;
 
 import java.util.Arrays;
 
@@ -175,5 +176,37 @@ public class TranspositionTable {
 
 	public int getHashFull() {
 		return (int) (1000L * entriesOccupied / size);
+	}
+
+	/**
+	 * Returns true if we can use the value stored on the TT to return from search
+	 */
+	public boolean canUseTT(int depthRemaining, int alpha, int beta) {
+		if (getDepthAnalyzed() >= depthRemaining) {
+			switch (getNodeType()) {
+				case TranspositionTable.TYPE_EXACT_SCORE:
+					if (SearchStats.DEBUG) {
+						SearchStats.ttPvHit++;
+					}
+					return true;
+				case TranspositionTable.TYPE_FAIL_LOW:
+					if (SearchStats.DEBUG) {
+						SearchStats.ttLBHit++;
+					}
+					if (getScore() <= alpha) {
+						return true;
+					}
+					break;
+				case TranspositionTable.TYPE_FAIL_HIGH:
+					if (SearchStats.DEBUG) {
+						SearchStats.ttUBHit++;
+					}
+					if (getScore() >= beta) {
+						return true;
+					}
+					break;
+			}
+		}
+		return false;
 	}
 }
