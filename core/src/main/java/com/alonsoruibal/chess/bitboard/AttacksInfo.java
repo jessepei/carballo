@@ -136,7 +136,10 @@ public class AttacksInfo {
 		checkPinnerRook(kingIndex[W], rookAttacksKing[W], all, board.whites, (board.rooks | board.queens) & board.blacks);
 		rookAttacksKing[B] = bbAttacks.getRookAttacks(kingIndex[B], all);
 		checkPinnerRook(kingIndex[B], rookAttacksKing[B], all, board.blacks, (board.rooks | board.queens) & board.whites);
+		attack(all, mines, myKing, us, board);
+	}
 
+	public void attack(long all, long mines, long myKing, int us, Board board) {
 		long pieceAttacks;
 		int index;
 		long square = 1;
@@ -209,3 +212,4 @@ public class AttacksInfo {
 		attackedSquares[B] = pawnAttacks[B] | knightAttacks[B] | bishopAttacks[B] | rookAttacks[B] | queenAttacks[B] | kingAttacks[B];
 	}
 }
+
