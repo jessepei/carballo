@@ -48,7 +48,7 @@ public class SearchEngine implements Runnable {
 	private static final int[] IID_DEPTH = {5 * PLY, 5 * PLY, 8 * PLY};
 
 	private static final int IID_MARGIN = 150;
-	private static final int SINGULAR_EXTENSION_MARGIN_PER_PLY = 1;
+	private static final int EXT_MARGIN_PER_PLY = 1;
 	private static final int[] ASPIRATION_WINDOW_SIZES = {10, 25, 150, 400, 550, 1025};
 	private static final int FUTILITY_MARGIN_QS = 50;
 
@@ -621,7 +621,7 @@ public class SearchEngine implements Runnable {
 				if (SearchStats.DEBUG) {
 					SearchStats.singularExtensionProbe++;
 				}
-				int seBeta = ttScore - SINGULAR_EXTENSION_MARGIN_PER_PLY * depthRemaining / PLY;
+				int seBeta = ttScore - EXT_MARGIN_PER_PLY * depthRemaining / PLY;
 				int excScore = search(nodeType, depthRemaining >> 1, seBeta - 1, seBeta, false, node.move);
 				if (excScore < seBeta) {
 					if (SearchStats.DEBUG) {
